@@ -1,0 +1,29 @@
+<ion-view view-title="Inicial">
+  <ion-content class="padding">
+    <h5 class="positive">IMEI: 123456</h5>
+
+    <button class="button button-block button-positive">
+      Última ação: {{lastAction.name}}
+    </button>
+
+    <div class="item item-divider">
+      Ações
+    </div>
+    <div class="list">
+      <a class="item item-icon-left" href="#{{service.id}}" ng-repeat="service in services">
+        <i class="icon {{service.icon}}"></i>
+        {{service.name}}
+      </a>
+    </div>
+
+    <div class="item item-divider">
+      Histórico
+    </div>
+    <div class="list">
+      <a class="item item-icon-left" href="#tab/history">
+        <i class="icon ion-ios-search-strong"></i>
+        Visualizar últimos registros
+      </a>
+    </div>
+  </ion-content>
+</ion-view>
