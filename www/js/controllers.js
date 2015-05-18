@@ -1,13 +1,21 @@
 angular.module('starter.controllers', [])
 
-.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope) {
+.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice) {
+  
+  document.addEventListener('deviceready', function () {
+  	$rootScope.imei = $cordovaDevice.getUUID();
+  }, false);
+
   $scope.login = function(login) {
+  	$scope.invalidUser = false;
   	if(login.cpf === '123' || login.cpf === 'abc' && login.pass === '123') {
   		Login.setLoggedIn(true);
   		Login.setCurrentUser(login.cpf);
   		login.cpf = '';
   		login.pass = '';
   		$location.path('/tab/home');
+  	} else {
+  		$scope.invalidUser = true;
   	}
   	$rootScope.show = true;
   };
@@ -38,7 +46,7 @@ angular.module('starter.controllers', [])
   $scope.doLogout();
 })
 
-.controller('HomeCtrl', function($scope, Services, Login, Events, DateUtils) {
+.controller('HomeCtrl', function($scope, Services, Login, Events, DateUtils, $cordovaGeolocation) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
   $scope.services = Services.all();
@@ -67,7 +75,13 @@ angular.module('starter.controllers', [])
   	$scope.service = service;
   	$scope.addConfirm = true;
   	$scope.date = DateUtils.getCurrentFormat();
-  	$scope.gps = '123123 132123';
+  	$scope.gps = '';
+  	
+  	var posOptions = {timeout: 10000, enableHighAccuracy: false};
+	$cordovaGeolocation.getCurrentPosition(posOptions)
+	    .then(function (position) {
+	      	$scope.gps = position.coords.latitude + ',' + position.coords.longitude;
+	    });
   };
 
   $scope.cancelAdd = function() {
