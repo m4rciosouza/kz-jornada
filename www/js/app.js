@@ -33,7 +33,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   .state('tab', {
     url: "/tab",
     abstract: true,
-    templateUrl: "templates/tabs.html"
+    templateUrl: "templates/tabs.html",
+    cache: false
   })
 
   // Each tab has its own nav history stack:
@@ -45,7 +46,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
         templateUrl: 'templates/tab-login.html',
         controller: 'LoginCtrl'
       }
-    }
+    },
+    cache: false
   })
 
   .state('tab.home', {
@@ -55,7 +57,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
         templateUrl: 'templates/tab-home.html',
         controller: 'HomeCtrl'
       }
-    }
+    },
+    cache: false
+  })
+
+  .state('tab.stored', {
+    url: '/stored',
+    views: {
+      'tab-stored': {
+        templateUrl: 'templates/tab-stored.html',
+        controller: 'StoredCtrl'
+      }
+    },
+    cache: false
   })
 
   .state('tab.history', {
@@ -65,10 +79,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
         templateUrl: 'templates/tab-history.html',
         controller: 'HistoryCtrl'
       }
-    }
+    },
+    cache: false
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/login');
+  $urlRouterProvider.otherwise('/tab/home');
 
 });

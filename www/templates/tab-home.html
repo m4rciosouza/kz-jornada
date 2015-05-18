@@ -1,29 +1,42 @@
 <ion-view view-title="Inicial">
   <ion-content class="padding">
-    <h5 class="positive">IMEI: 123456</h5>
+    <h5 class="positive">Usuário: {{loggedUser}}</h5>
 
-    <button class="button button-block button-positive">
-      Última ação: {{lastAction.name}}
+    <button class="button button-block button-energized" ng-show="hasCurrentEvent">
+      Última ação: {{currentEventName}}, iniciada em {{currentEvent.initialDate}}
     </button>
 
-    <div class="item item-divider">
+    <div class="item item-divider" ng-hide="addConfirm">
       Ações
     </div>
-    <div class="list">
-      <a class="item item-icon-left" href="#{{service.id}}" ng-repeat="service in services">
+    <div class="list" ng-hide="addConfirm">
+      <a class="item item-icon-left" href="" ng-repeat="service in services" 
+        ng-click="confirm(service)"
+        ng-if="service.id==currentEvent.serviceId || !hasCurrentEvent">
         <i class="icon {{service.icon}}"></i>
         {{service.name}}
       </a>
     </div>
 
-    <div class="item item-divider">
-      Histórico
+    <div class="item item-divider" ng-show="addConfirm">
+      Operação: {{service.name}}
     </div>
-    <div class="list">
-      <a class="item item-icon-left" href="#tab/history">
-        <i class="icon ion-ios-search-strong"></i>
-        Visualizar últimos registros
+    <div class="list" ng-show="addConfirm">
+      <a class="item" href="">
+        <strong>Hora:</strong> {{date}}
+      </a>
+      <a class="item" href="">
+        <strong>Posição GPS:</strong> {{gps}}
       </a>
     </div>
+    <button class="button button-block button-positive" 
+      ng-click="add()" ng-show="addConfirm">
+      Confirmar
+    </button>
+    <button class="button button-block button-stable" 
+      ng-click="cancelAdd()" ng-show="addConfirm">
+      Voltar
+    </button>
+
   </ion-content>
 </ion-view>

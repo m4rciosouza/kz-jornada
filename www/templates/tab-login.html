@@ -2,16 +2,17 @@
   <ion-content class="padding">
     <h5 class="positive">IMEI: 123456</h5>
     <h5>Digite suas credenciais para acessar o sistema:</h5>
-    <div class="list">
+    <div class="list" ng-if="!isLoggedIn()">
       <label class="item item-input">
-        <input type="text" placeholder="CPF (somente números)">
+        <input type="text" placeholder="CPF (somente números)" name="cpf" ng-model="login.cpf">
       </label>
       <label class="item item-input">
-        <input type="text" placeholder="Senha">
+        <input type="password" placeholder="Senha" name="pass" ng-model="login.pass">
       </label>
-      <button class="button button-block button-positive" ng-click="submit()">
+      <button class="button button-block button-positive" ng-click="login(login)">
         Entrar
       </button>
     </div>
+
   </ion-content>
 </ion-view>
