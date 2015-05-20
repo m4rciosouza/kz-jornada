@@ -27,7 +27,7 @@ angular.module('starter.services', [])
       if(hours.toString().length === 1) {
         hours = '0' + hours;
       }
-      var minutes = date.getMinutes() + 1;
+      var minutes = date.getMinutes();
       if(minutes.toString().length === 1) {
         minutes = '0' + minutes;
       }
@@ -36,6 +36,17 @@ angular.module('starter.services', [])
         seconds = '0' + seconds;
       }
       return hours + ':' + minutes + ':' + seconds;
+    },
+
+    addMinutes: function(date, minutes) {
+      return new Date(date.getTime() + minutes*60000);
+    },
+
+    getDateFromText: function(textDate) {
+      var dateTime = textDate.split(' ');
+      var date = dateTime[0].split('/');
+      var time = dateTime[1].split(':');
+      return new Date(date[2], date[1]-1, date[0], time[0], time[1], time[2]);
     }
   };
 })
@@ -77,18 +88,20 @@ angular.module('starter.services', [])
         'serviceSlug': serviceSlug, 
         'gps': gps,
         'initialDate': date,
-        'endDate': ''
+        'endDate': '',
+        'eventMsgId': ''
       };
       var events = this.getAll();
       events.push(event);
       $window.localStorage.events = angular.toJson(events);
     },
 
-    setEndDateByUser: function(user, date) {
+    setEndDateByUser: function(user, date, eventMsgId) {
       var events = this.getAll();
       for(var i=(events.length-1); i>=0; i--) {
         if(events[i].user === user) {
           events[i].endDate = date;
+          events[i].eventMsgId = eventMsgId;
           $window.localStorage.events = angular.toJson(events);
           break;
         }
@@ -177,6 +190,44 @@ angular.module('starter.services', [])
         }
       }
       return null;
+    }
+  };
+})
+
+.factory('ServicesMsg', function() {
+
+  var servicesMsg = [
+    { id: '1', name: 'Desc. da justificativa #1' },
+    { id: '2', name: 'Desc. da justificativa #2' },
+    { id: '3', name: 'Desc. da justificativa #3' },
+    { id: '4', name: 'Outra justificativa' },
+  ];
+
+  return {
+    all: function() {
+      return servicesMsg;
+    },
+
+    remove: function(service) {
+      servicesMsg.splice(servicesMsg.indexOf(servicesMsg), 1);
+    },
+
+    get: function(id) {
+      for (var i = 0; i < servicesMsg.length; i++) {
+        if (servicesMsg[i].id === id) {
+          return servicesMsg[i];
+        }
+      }
+      return null;
+    }
+  };
+})
+
+.factory('Sync', function() {
+
+  return {
+    timeAlert: function() {
+      console.log('tentando sincronizar com o servidor');
     }
   };
 });

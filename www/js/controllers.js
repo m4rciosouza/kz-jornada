@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice) {
+.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice, Events) {
   
   document.addEventListener('deviceready', function () {
   	$rootScope.imei = $cordovaDevice.getUUID();
@@ -39,6 +39,11 @@ angular.module('starter.controllers', [])
 
   $scope.doLogout = function() {
   	if($scope.isLoggedIn) {
+  		var loggedUser = Login.getCurrentUser();
+  		var current = Events.getCurrentByUser(loggedUser);
+  		if(current) {
+  			Events.setEndDateByUser(loggedUser, 'sem status');
+  		}
   		$scope.logout();
   	}
   };
@@ -46,10 +51,12 @@ angular.module('starter.controllers', [])
   $scope.doLogout();
 })
 
-.controller('HomeCtrl', function($scope, Services, Login, Events, DateUtils, $cordovaGeolocation) {
+.controller('HomeCtrl', function($scope, Services, Login, Events, DateUtils, 
+		ServicesMsg, $cordovaGeolocation) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
   $scope.services = Services.all();
+  $scope.servicesMsg = ServicesMsg.all();
 
   $scope.getCurrentEvent = function() {
   	$scope.hasCurrentEvent = false;
@@ -61,14 +68,15 @@ angular.module('starter.controllers', [])
   	}
   };
   
-  $scope.add = function() {
+  $scope.add = function(eventMsgId) {
   	if($scope.hasCurrentEvent && $scope.service.id === $scope.currentEvent.serviceId) {
-  		Events.setEndDateByUser($scope.loggedUser, $scope.date);
+  		Events.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId);
   	} else {
   		Events.add($scope.service.id, $scope.service.slug, $scope.gps, $scope.date);
   	}
   	$scope.addConfirm = false;
   	$scope.getCurrentEvent();
+  	$scope.checkHasToJustify();
   };
 
   $scope.confirm = function(service) {
@@ -84,11 +92,50 @@ angular.module('starter.controllers', [])
 	    });
   };
 
-  $scope.cancelAdd = function() {
-  	$scope.addConfirm = false;
+  $scope.checkHasToJustify = function() {
+  	if(!$scope.hasCurrentEvent) {
+  		$scope.hasToJustify = false;
+  		return;
+  	}
+
+  	// descanso < 30 min
+  	if($scope.currentEvent.serviceId === '3') {
+  		var initialDate = DateUtils.getDateFromText($scope.currentEvent.initialDate);
+  		var checkDate = DateUtils.addMinutes(initialDate, 30);
+  		var currentDate = new Date();
+  		if(currentDate.getTime() < checkDate.getTime()) {
+  			$scope.hasToJustify = true;
+  		}
+  		return;
+  	}
+
+  	// refeição < 1 hora
+  	if($scope.currentEvent.serviceId === '4') {
+  		var initialDate = DateUtils.getDateFromText($scope.currentEvent.initialDate);
+  		var checkDate = DateUtils.addMinutes(initialDate, 60);
+  		var currentDate = new Date();
+  		if(currentDate.getTime() < checkDate.getTime()) {
+  			$scope.hasToJustify = true;
+  		}
+  		return;
+  	}
+
+  	// volante > 5h30
+  	if($scope.currentEvent.serviceId === '2') {
+  		var initialDate = DateUtils.getDateFromText($scope.currentEvent.initialDate);
+  		var checkDate = DateUtils.addMinutes(initialDate, 330);
+  		var currentDate = new Date();
+  		if(currentDate.getTime() > checkDate.getTime()) {
+  			$scope.hasToJustify = true;
+  		}
+  		return;
+  	}
+
+  	$scope.hasToJustify = false;
   };
 
   $scope.getCurrentEvent();
+  $scope.checkHasToJustify();
 })
 
 .controller('StoredCtrl', function($scope, Login, Events, Services) {
@@ -96,18 +143,17 @@ angular.module('starter.controllers', [])
   $scope.loggedUser = Login.getCurrentUser();
   var user = Login.getCurrentUser();
   $scope.events = Events.getAllByUser(user);
+})
 
-  $scope.getEventNameBySlug = function(slug) {
-  	var event = Services.getBySlug(slug);
-  	return event.name;
-  };
+.controller('SyncCtrl', function($scope, Login) {
+  Login.validate();
+  //TODO implement server sync
 })
 
 .controller('HistoryCtrl', function($scope, Login, Events, Services) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
-  var user = Login.getCurrentUser();
-  $scope.events = Events.getAllByUser(user);
+  $scope.events = Events.getAllByUser($scope.loggedUser);
 
   $scope.getEventNameBySlug = function(slug) {
   	var event = Services.getBySlug(slug);

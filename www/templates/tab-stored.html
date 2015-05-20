@@ -1,22 +1,9 @@
 <ion-view view-title="Armazenado">
   <ion-content class="padding">
     <h5 class="positive">Usuário: {{loggedUser}}</h5>
-
-    <h6 ng-show="events.length<=0">Nenhum evento registrado.</h6>
-
-    <div class="margin-bottom-10" ng-repeat="event in events">
-		<div class="item item-divider">
-		  {{getEventNameBySlug(event.serviceSlug)}}
-		</div>
-		<div class="list">
-		  <a class="item" href="">
-		    <strong>Hora de início:</strong> {{event.initialDate}}
-		  </a>
-		  <a class="item" href="">
-		    <strong>Hora de término:</strong> {{event.endDate}}
-		  </a>
-		</div>
-	</div>
-
+    <br />
+    <h5 ng-show="events.length<=0" class="text-center">Nenhum evento à ser sincronizado.</h5>
+    <h5 ng-show="events.length==1" class="text-center">Existe {{events.length}} evento à ser sincronizado.</h5>
+     <h5 ng-show="events.length>1" class="text-center">Existem {{events.length}} eventos à serem sincronizados.</h5>
   </ion-content>
 </ion-view>

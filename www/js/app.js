@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, Sync, $interval) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,6 +19,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleLightContent();
     }
   });
+  $interval(Sync.timeAlert, 1000*60*2);
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -67,6 +68,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'tab-stored': {
         templateUrl: 'templates/tab-stored.html',
         controller: 'StoredCtrl'
+      }
+    },
+    cache: false
+  })
+
+  .state('tab.sync', {
+    url: '/sync',
+    views: {
+      'tab-sync': {
+        templateUrl: 'templates/tab-sync.html',
+        controller: 'SyncCtrl'
       }
     },
     cache: false
