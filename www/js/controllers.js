@@ -18,10 +18,12 @@ angular.module('starter.controllers', [])
   		$scope.invalidUser = true;
   	}
   	$rootScope.show = true;
+  	$rootScope.hideTabs = false;
   };
 
   $scope.logout = function() {
   	$rootScope.show = false;
+  	$rootScope.hideTabs = true;
   	delete $window.localStorage.isLoggedIn;
   	delete $window.localStorage.user;
   	$location.path('/tab/login');

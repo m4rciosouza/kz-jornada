@@ -19,6 +19,14 @@ ionic build ios
 ionic emulate ios
 ```
 
+### Cordova plugins
+```
+cordova plugin add cordova-plugin-dialogs
+cordova plugin add cordova-plugin-device
+cordova plugin add cordova-plugin-geolocation
+```
+
+
 ### License
 
 [BSD license](http://opensource.org/licenses/bsd-license.php)

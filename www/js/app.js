@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova'])
 
-.run(function($ionicPlatform, Sync, $interval) {
+.run(function($ionicPlatform, Sync, $interval, $rootScope, $window) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,7 +19,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleLightContent();
     }
   });
-  $interval(Sync.timeAlert, 1000*60*1);
+  $interval(Sync.timeAlert, 1000*60*15);
+  $rootScope.hideTabs = !($window.localStorage.isLoggedIn || false);
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
