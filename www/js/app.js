@@ -19,7 +19,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleLightContent();
     }
   });
-  $interval(Sync.timeAlert, 1000*60*2);
+  $interval(Sync.timeAlert, 1000*60*1);
 })
 
 .config(function($stateProvider, $urlRouterProvider) {

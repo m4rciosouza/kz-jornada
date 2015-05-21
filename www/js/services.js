@@ -223,11 +223,15 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('Sync', function() {
+.factory('Sync', function($cordovaDialogs) {
 
   return {
     timeAlert: function() {
-      console.log('tentando sincronizar com o servidor');
+      $cordovaDialogs.alert('Descrição do alerta!', 'Mensagem de alerta', 'OK')
+        .then(function() {
+          console.log('alerta executado com sucesso!');
+        });
+      $cordovaDialogs.beep(3);
     }
   };
 });
