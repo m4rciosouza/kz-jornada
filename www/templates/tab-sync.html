@@ -1,6 +1,26 @@
 <ion-view view-title="Sincronizar">
   <ion-content class="padding">
   	<br />
-    <h5 class="text-center">TODO: implementar sincronização com o servidor...</h5>
+
+  	<div ng-hide="success || error">
+	  	<div class="text-center">
+	  		<ion-spinner></ion-spinner>
+	  	</div>
+	    <h5 class="text-center">Aguarde enquanto os dados são sincronizados com o servidor...</h5>
+	</div>
+
+    <button class="button button-block button-balanced" ng-show="success">
+      Dados sincronizados com sucesso!
+    </button>
+
+	<button class="button button-block button-assertive" ng-show="error">
+      Erro sincronizando dados.
+    </button>
+
+    <button class="button button-block button-positive" ng-show="error"
+    	ng-click="sendToServer()">
+      Sincronizar dados novamente.
+    </button>
+
   </ion-content>
 </ion-view>

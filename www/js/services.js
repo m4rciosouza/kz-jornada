@@ -108,6 +108,17 @@ angular.module('starter.services', [])
       }
     },
 
+    remove: function(event) {
+      var events = this.getAll();
+      var newEvents = [];
+      for(var i=0; i<events.length; i++) {
+        if(events[i].id !== event.id) {
+          newEvents.push(events[i]);
+        }
+      }
+      $window.localStorage.events = angular.toJson(newEvents);
+    },
+
     getAll: function() {
       if($window.localStorage.events) {
         return angular.fromJson($window.localStorage.events);
@@ -149,6 +160,47 @@ angular.module('starter.services', [])
         return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
       }
       return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+  };
+})
+
+.factory('EventsHist', function($window, Login, Events) {
+  return {
+    add: function() {
+      var event = Events.getLastByUser(Login.getCurrentUser());
+      var events = this.getAll();
+      events.push(event);
+      $window.localStorage.eventsHist = angular.toJson(events);
+    },
+
+    setEndDateByUser: function(user, date, eventMsgId) {
+      var events = this.getAll();
+      for(var i=(events.length-1); i>=0; i--) {
+        if(events[i].user === user) {
+          events[i].endDate = date;
+          events[i].eventMsgId = eventMsgId;
+          $window.localStorage.eventsHist = angular.toJson(events);
+          break;
+        }
+      }
+    },
+
+    getAll: function() {
+      if($window.localStorage.eventsHist) {
+        return angular.fromJson($window.localStorage.eventsHist);
+      }
+      return [];
+    },
+
+    getAllByUser: function(user) {
+      var events = this.getAll();
+      var userEvents = [];
+      for(var i=(events.length-1); i>=0; i--) {
+        if(events[i].user === user) {
+          userEvents.push(events[i]);
+        }
+      }
+      return userEvents;
     }
   };
 })
@@ -223,15 +275,56 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('Sync', function($cordovaDialogs) {
+.factory('Sync', function($rootScope, $cordovaDialogs, Events, Login, DateUtils) {
 
   return {
+
+    sendToServer: function() {
+      var events = Events.getAllByUser(Login.getCurrentUser());
+      // TODO enviar pro servidor
+      for(var i=0; i<events.length; i++) {
+        if(events[i].endDate !== '') {
+          Events.remove(events[i]);
+        }
+      }
+      //$rootScope.success = true;
+      //$rootScope.error = true;
+    },
+
     timeAlert: function() {
-      $cordovaDialogs.alert('Descrição do alerta!', 'Mensagem de alerta', 'OK')
-        .then(function() {
-          console.log('alerta executado com sucesso!');
-        });
-      $cordovaDialogs.beep(3);
+      var current = Events.getCurrentByUser(Login.getCurrentUser());
+
+      // descanso >= 30 min
+      if(current.serviceId === '3') {
+        var initialDate = DateUtils.getDateFromText(current.initialDate);
+        var checkDate = DateUtils.addMinutes(initialDate, 30);
+        var currentDate = new Date();
+        if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.alert('O descanso de 30 minutos ultrapassou o limite de tempo.', 'Atenção!', 'OK');
+        }
+      }
+
+      // refeição >= 1 hora
+      if(current.serviceId === '4') {
+        var initialDate = DateUtils.getDateFromText(current.initialDate);
+        var checkDate = DateUtils.addMinutes(initialDate, 60);
+        var currentDate = new Date();
+        if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.alert('O limite de tempo da refeição ultrapassou 1 hora.', 'Atenção!', 'OK');
+        }
+      }
+
+      // volante > 5h30
+      if(current.serviceId === '2') {
+        var initialDate = DateUtils.getDateFromText(current.initialDate);
+        var checkDate = DateUtils.addMinutes(initialDate, 330);
+        var currentDate = new Date();
+        if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.alert('O limite de tempo de volante ultrapassou 5h30.', 'Atenção!', 'OK');
+        }
+      }
+
+      $cordovaDialogs.beep(1);
     }
   };
 });

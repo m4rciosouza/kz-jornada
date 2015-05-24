@@ -1,6 +1,7 @@
 angular.module('starter.controllers', [])
 
-.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice, Events) {
+.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice, 
+  Events, EventsHist) {
   
   document.addEventListener('deviceready', function () {
   	$rootScope.imei = $cordovaDevice.getUUID();
@@ -13,12 +14,12 @@ angular.module('starter.controllers', [])
   		Login.setCurrentUser(login.cpf);
   		login.cpf = '';
   		login.pass = '';
+      $rootScope.show = true;
+      $rootScope.hideTabs = false;
   		$location.path('/tab/home');
   	} else {
   		$scope.invalidUser = true;
   	}
-  	$rootScope.show = true;
-  	$rootScope.hideTabs = false;
   };
 
   $scope.logout = function() {
@@ -45,6 +46,7 @@ angular.module('starter.controllers', [])
   		var current = Events.getCurrentByUser(loggedUser);
   		if(current) {
   			Events.setEndDateByUser(loggedUser, 'sem status');
+        EventsHist.setEndDateByUser(loggedUser, 'sem status');
   		}
   		$scope.logout();
   	}
@@ -53,8 +55,8 @@ angular.module('starter.controllers', [])
   $scope.doLogout();
 })
 
-.controller('HomeCtrl', function($scope, Services, Login, Events, DateUtils, 
-		ServicesMsg, $cordovaGeolocation) {
+.controller('HomeCtrl', function($scope, Services, Login, Events, EventsHist, DateUtils, 
+		ServicesMsg, $ionicPlatform, $cordovaGeolocation) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
   $scope.services = Services.all();
@@ -73,8 +75,10 @@ angular.module('starter.controllers', [])
   $scope.add = function(eventMsgId) {
   	if($scope.hasCurrentEvent && $scope.service.id === $scope.currentEvent.serviceId) {
   		Events.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId);
+      EventsHist.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId);
   	} else {
   		Events.add($scope.service.id, $scope.service.slug, $scope.gps, $scope.date);
+      EventsHist.add();
   	}
   	$scope.addConfirm = false;
   	$scope.getCurrentEvent();
@@ -87,11 +91,13 @@ angular.module('starter.controllers', [])
   	$scope.date = DateUtils.getCurrentFormat();
   	$scope.gps = '';
   	
-  	var posOptions = {timeout: 10000, enableHighAccuracy: false};
-	$cordovaGeolocation.getCurrentPosition(posOptions)
-	    .then(function (position) {
-	      	$scope.gps = position.coords.latitude + ',' + position.coords.longitude;
-	    });
+    $ionicPlatform.ready(function() {
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+      $cordovaGeolocation.getCurrentPosition(posOptions)
+        .then(function (position) {
+            $scope.gps = position.coords.latitude + ',' + position.coords.longitude;
+        });
+    }); 	
   };
 
   $scope.checkHasToJustify = function() {
@@ -147,15 +153,22 @@ angular.module('starter.controllers', [])
   $scope.events = Events.getAllByUser(user);
 })
 
-.controller('SyncCtrl', function($scope, Login) {
-  Login.validate();
-  //TODO implement server sync
+.controller('SyncCtrl', function($scope, $rootScope, Login, Sync) {
+
+  $scope.sendToServer = function() {
+    $rootScope.success = false;
+    $rootScope.error = false;
+    Login.validate();
+    Sync.sendToServer();
+  };
+
+  $scope.sendToServer();
 })
 
-.controller('HistoryCtrl', function($scope, Login, Events, Services) {
+.controller('HistoryCtrl', function($scope, Login, EventsHist, Services) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
-  $scope.events = Events.getAllByUser($scope.loggedUser);
+  $scope.events = EventsHist.getAllByUser($scope.loggedUser);
 
   $scope.getEventNameBySlug = function(slug) {
   	var event = Services.getBySlug(slug);
