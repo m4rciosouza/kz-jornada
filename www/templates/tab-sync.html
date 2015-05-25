@@ -7,18 +7,22 @@
 	  		<ion-spinner></ion-spinner>
 	  	</div>
 	    <h5 class="text-center">Aguarde enquanto os dados são sincronizados com o servidor...</h5>
-	</div>
+  	</div>
+
+    <div class="text-center" ng-hide="success || error">
+      Sincronizados: {{completed}} de {{total}}
+    </div>
 
     <button class="button button-block button-balanced" ng-show="success">
       Dados sincronizados com sucesso!
     </button>
 
-	<button class="button button-block button-assertive" ng-show="error">
+  	<button class="button button-block button-assertive" ng-show="error">
       Erro sincronizando dados.
     </button>
 
     <button class="button button-block button-positive" ng-show="error"
-    	ng-click="sendToServer()">
+     	ng-click="sendToServer()">
       Sincronizar dados novamente.
     </button>
 

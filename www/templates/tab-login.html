@@ -16,6 +16,11 @@
         <input type="password" placeholder="Senha" name="pass" ng-model="login.pass">
       </label>
       <h6 class="assertive" ng-show="invalidUser">Usuário/senha inválido(s)</h6>
+
+      <div class="text-center" ng-show="loggingIn">
+        <ion-spinner></ion-spinner>
+      </div>
+      
       <button class="button button-block button-positive" ng-click="login(login)">
         Entrar
       </button>

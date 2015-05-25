@@ -1,7 +1,7 @@
 angular.module('starter.controllers', [])
 
 .controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice, 
-  Events, EventsHist) {
+  Events, EventsHist, $http, md5Service, API_URL) {
   
   document.addEventListener('deviceready', function () {
   	$rootScope.imei = $cordovaDevice.getUUID();
@@ -9,18 +9,38 @@ angular.module('starter.controllers', [])
 
   $scope.login = function(login) {
   	$scope.invalidUser = false;
-  	if(login.cpf === '123' || login.cpf === 'abc' && login.pass === '123') {
-  		Login.setLoggedIn(true);
-  		Login.setCurrentUser(login.cpf);
-  		login.cpf = '';
-  		login.pass = '';
-      $rootScope.show = true;
-      $rootScope.hideTabs = false;
-  		$location.path('/tab/home');
-  	} else {
-  		$scope.invalidUser = true;
-  	}
+
+    // local authentication
+    var token = $window.localStorage.token || false;
+    var userToken = md5Service.md5(login.cpf + login.pass);
+    if(token !== false && userToken === token) {
+      $scope.processLogin(login);
+      return;
+    }
+    
+    // remote authentication
+    $scope.loggingIn = true;
+    $http.post(API_URL + 'usuarios/autenticar', { usuario:login.cpf, senha:login.pass }).
+      success(function(data) {
+        $window.localStorage.token = data.token;
+        $scope.loggingIn = false;
+        $scope.processLogin(login);
+      }).
+      error(function() {
+        $scope.loggingIn = false;
+        $scope.invalidUser = true;
+      });
   };
+
+  $scope.processLogin = function(login) {
+    Login.setLoggedIn(true);
+    Login.setCurrentUser(login.cpf);
+    login.cpf = '';
+    login.pass = '';
+    $rootScope.show = true;
+    $rootScope.hideTabs = false;
+    $location.path('/tab/home');
+  }
 
   $scope.logout = function() {
   	$rootScope.show = false;

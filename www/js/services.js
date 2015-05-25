@@ -108,11 +108,11 @@ angular.module('starter.services', [])
       }
     },
 
-    remove: function(event) {
+    remove: function(eventId) {
       var events = this.getAll();
       var newEvents = [];
       for(var i=0; i<events.length; i++) {
-        if(events[i].id !== event.id) {
+        if(events[i].id !== eventId) {
           newEvents.push(events[i]);
         }
       }
@@ -249,10 +249,10 @@ angular.module('starter.services', [])
 .factory('ServicesMsg', function() {
 
   var servicesMsg = [
-    { id: '1', name: 'Desc. da justificativa #1' },
-    { id: '2', name: 'Desc. da justificativa #2' },
-    { id: '3', name: 'Desc. da justificativa #3' },
-    { id: '4', name: 'Outra justificativa' },
+    { id: '1', name: 'Alta periculosidade' },
+    { id: '2', name: 'Particularidade da carga' },
+    { id: '3', name: 'Descanso fracionado' }, // (somente para descanso)
+    { id: '4', name: 'Outros' },
   ];
 
   return {
@@ -271,24 +271,56 @@ angular.module('starter.services', [])
         }
       }
       return null;
+    },
+
+    getName: function(id) {
+      var msg = this.get(id);
+      if(msg) {
+        return msg.name;
+      }
+      return null;
     }
   };
 })
 
-.factory('Sync', function($rootScope, $cordovaDialogs, Events, Login, DateUtils) {
+.factory('Sync', function($rootScope, $cordovaDialogs, Events, Login, DateUtils, $http, 
+    API_URL, VERSAO, ServicesMsg) {
 
   return {
 
     sendToServer: function() {
       var events = Events.getAllByUser(Login.getCurrentUser());
-      // TODO enviar pro servidor
+      $rootScope.completed = 0;
+      $rootScope.total = events.length;
+
       for(var i=0; i<events.length; i++) {
-        if(events[i].endDate !== '') {
-          Events.remove(events[i]);
+        if(events[i].endDate === '') {
+          continue;
         }
+        $http.post(API_URL + 'jornadas/cadastrar', 
+            { 
+              eventId: events[i].id,
+              usuario: events[i].user, 
+              gps: events[i].gps, 
+              tipo: events[i].serviceId, 
+              dataInicial: events[i].initialDate, 
+              dataFinal: events[i].endDate, 
+              imei: $rootScope.imei || '123456',
+              versao: VERSAO,
+              justificativa: ServicesMsg.getName(events[i].eventMsgId)
+            }).
+          success(function(data) {
+            Events.remove(data.eventId);
+            $rootScope.completed++;
+            if($rootScope.completed === $rootScope.total) {
+              $rootScope.success = true;
+            }
+          }).
+          error(function() {
+            console.log('SUCCESS: ' + data);
+            $rootScope.error = true;
+          });
       }
-      //$rootScope.success = true;
-      //$rootScope.error = true;
     },
 
     timeAlert: function() {

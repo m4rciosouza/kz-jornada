@@ -24,6 +24,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $rootScope.hideTabs = !($window.localStorage.isLoggedIn || false);
 })
 
+.constant( 'API_URL', 'http://localhost:8888/kz-jornada-api/web/v1/' )
+//.constant( 'API_URL', 'http://kzjornadaapi.kazale.com/web/v1/' )
+.constant( 'VERSAO', '001' )
+
 .config(function($stateProvider, $urlRouterProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
