@@ -292,35 +292,40 @@ angular.module('starter.services', [])
       var events = Events.getAllByUser(Login.getCurrentUser());
       $rootScope.completed = 0;
       $rootScope.total = events.length;
+      var dataPost = [];
 
       for(var i=0; i<events.length; i++) {
         if(events[i].endDate === '') {
           continue;
         }
-        $http.post(API_URL + 'jornadas/cadastrar', 
-            { 
-              eventId: events[i].id,
-              usuario: events[i].user, 
-              gps: events[i].gps, 
-              tipo: events[i].serviceId, 
-              dataInicial: events[i].initialDate, 
-              dataFinal: events[i].endDate, 
-              imei: $rootScope.imei || '123456',
-              versao: VERSAO,
-              justificativa: ServicesMsg.getName(events[i].eventMsgId)
-            }).
-          success(function(data) {
-            Events.remove(data.eventId);
-            $rootScope.completed++;
-            if($rootScope.completed === $rootScope.total) {
-              $rootScope.success = true;
-            }
-          }).
-          error(function() {
-            console.log('SUCCESS: ' + data);
-            $rootScope.error = true;
-          });
+        dataPost.push({ 
+          eventId: events[i].id,
+          usuario: events[i].user, 
+          gps: events[i].gps, 
+          tipo: events[i].serviceId, 
+          dataInicial: events[i].initialDate, 
+          dataFinal: events[i].endDate, 
+          imei: $rootScope.imei || '123456',
+          versao: VERSAO,
+          justificativa: ServicesMsg.getName(events[i].eventMsgId)
+        });
       }
+      
+      if(dataPost.length === 0) {
+        return;
+      }
+
+      $http.post(API_URL + 'jornadas/cadastrar', { data: angular.toJson(dataPost) }).
+        success(function(data) {
+          var ids = data.ids;
+          for(var i=0; i<ids.length; i++) {
+            Events.remove(ids[i]);
+          }
+          $rootScope.success = true;
+        }).
+        error(function() {
+          $rootScope.error = true;
+        });
     },
 
     timeAlert: function() {
