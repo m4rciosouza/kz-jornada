@@ -1,11 +1,7 @@
 angular.module('starter.controllers', [])
 
-.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, $cordovaDevice, 
+.controller('LoginCtrl', function($scope, $location, $window, Login, $rootScope, 
   Events, EventsHist, $http, md5Service, API_URL) {
-  
-  document.addEventListener('deviceready', function () {
-  	$rootScope.imei = $cordovaDevice.getUUID();
-  }, false);
 
   $scope.login = function(login) {
   	$scope.invalidUser = false;
@@ -112,12 +108,12 @@ angular.module('starter.controllers', [])
   	$scope.gps = '';
   	
     $ionicPlatform.ready(function() {
-      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+      var posOptions = { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true };
       $cordovaGeolocation.getCurrentPosition(posOptions)
         .then(function (position) {
             $scope.gps = position.coords.latitude + ',' + position.coords.longitude;
         });
-    }); 	
+    }); 
   };
 
   $scope.checkHasToJustify = function() {

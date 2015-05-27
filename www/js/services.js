@@ -293,8 +293,6 @@ angular.module('starter.services', [])
 
     sendToServer: function() {
       var events = Events.getAllByUser(Login.getCurrentUser());
-      $rootScope.completed = 0;
-      $rootScope.total = events.length;
       var dataPost = [];
 
       for(var i=0; i<events.length; i++) {
