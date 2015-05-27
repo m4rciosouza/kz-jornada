@@ -94,7 +94,7 @@ angular.module('starter.controllers', [])
   
   $scope.add = function(eventMsgId) {
   	if($scope.hasCurrentEvent && $scope.service.id === $scope.currentEvent.serviceId) {
-  		Events.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId);
+  		Events.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId, $scope.gps);
       EventsHist.setEndDateByUser($scope.loggedUser, $scope.date, eventMsgId);
   	} else {
   		Events.add($scope.service.id, $scope.service.slug, $scope.gps, $scope.date);

@@ -86,7 +86,8 @@ angular.module('starter.services', [])
         'user': Login.getCurrentUser(),
         'serviceId': serviceId, 
         'serviceSlug': serviceSlug, 
-        'gps': gps,
+        'initialGps': gps,
+        'endGps': '',
         'initialDate': date,
         'endDate': '',
         'eventMsgId': ''
@@ -96,12 +97,14 @@ angular.module('starter.services', [])
       $window.localStorage.events = angular.toJson(events);
     },
 
-    setEndDateByUser: function(user, date, eventMsgId) {
+    setEndDateByUser: function(user, date, eventMsgId, gps) {
+      console.log(gps);
       var events = this.getAll();
       for(var i=(events.length-1); i>=0; i--) {
         if(events[i].user === user) {
           events[i].endDate = date;
           events[i].eventMsgId = eventMsgId;
+          events[i].endGps = gps;
           $window.localStorage.events = angular.toJson(events);
           break;
         }
@@ -301,7 +304,8 @@ angular.module('starter.services', [])
         dataPost.push({ 
           eventId: events[i].id,
           usuario: events[i].user, 
-          gps: events[i].gps, 
+          initialGps: events[i].initialGps,
+          endGps: events[i].endGps, 
           tipo: events[i].serviceId, 
           dataInicial: events[i].initialDate, 
           dataFinal: events[i].endDate, 
