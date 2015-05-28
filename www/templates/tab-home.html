@@ -43,14 +43,30 @@
       </label>
     </div>
 
-    <button class="button button-block button-positive" 
-      ng-click="add()" ng-show="addConfirm && !hasCurrentEvent">
+    <h3 class="text-center" ng-show="addConfirm && !hasCurrentEvent">
       Confirmar Início
-    </button>
-    <button class="button button-block button-positive" ng-disabled="!eventMsgId && hasToJustify"
-      ng-click="add(eventMsgId)" ng-show="addConfirm && hasCurrentEvent">
+    </h3>
+    <h3 class="text-center" ng-show="addConfirm && hasCurrentEvent">
       Confirmar Término
-    </button>
+    </h3>
+
+    <br />
+
+    <div class="button-bar">
+      <button class="button button-positive" 
+        ng-click="add()" ng-show="addConfirm && !hasCurrentEvent">
+        Sim
+      </button>
+
+      <button class="button button-positive" ng-disabled="!eventMsgId && hasToJustify"
+        ng-click="add(eventMsgId)" ng-show="addConfirm && hasCurrentEvent">
+        Sim
+      </button>
+
+      <button class="button button-stable" ng-click="back()" ng-show="addConfirm">
+        Não
+      </button>
+    </div>
 
   </ion-content>
 </ion-view>

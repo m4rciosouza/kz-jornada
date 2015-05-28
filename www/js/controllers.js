@@ -71,12 +71,11 @@ angular.module('starter.controllers', [])
   $scope.doLogout();
 })
 
-.controller('HomeCtrl', function($scope, Services, Login, Events, EventsHist, DateUtils, 
+.controller('HomeCtrl', function($scope, $rootScope, Services, Login, Events, EventsHist, DateUtils, 
 		ServicesMsg, $ionicPlatform, $cordovaGeolocation) {
   Login.validate();
   $scope.loggedUser = Login.getCurrentUser();
   $scope.services = Services.all();
-  $scope.servicesMsg = ServicesMsg.all();
 
   $scope.getCurrentEvent = function() {
   	$scope.hasCurrentEvent = false;
@@ -96,12 +95,22 @@ angular.module('starter.controllers', [])
   		Events.add($scope.service.id, $scope.service.slug, $scope.gps, $scope.date);
       EventsHist.add();
   	}
+    $rootScope.runSync = true;
+    $rootScope.hideTabs = false;
   	$scope.addConfirm = false;
   	$scope.getCurrentEvent();
   	$scope.checkHasToJustify();
   };
 
+  $scope.back = function() {
+    $rootScope.runSync = true;
+    $rootScope.hideTabs = false;
+    $scope.addConfirm = false;
+  };
+
   $scope.confirm = function(service) {
+    $rootScope.runSync = false;
+    $rootScope.hideTabs = true;
   	$scope.service = service;
   	$scope.addConfirm = true;
   	$scope.date = DateUtils.getCurrentFormat();
@@ -113,7 +122,15 @@ angular.module('starter.controllers', [])
         .then(function (position) {
             $scope.gps = position.coords.latitude + ',' + position.coords.longitude;
         });
-    }); 
+    });
+
+    if($scope.hasCurrentEvent) {
+      if($scope.currentEvent.serviceId === '3') {
+        $scope.servicesMsg = ServicesMsg.all();
+      } else {
+        $scope.servicesMsg = ServicesMsg.allLessBreak();
+      }
+    }
   };
 
   $scope.checkHasToJustify = function() {

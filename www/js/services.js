@@ -98,7 +98,6 @@ angular.module('starter.services', [])
     },
 
     setEndDateByUser: function(user, date, eventMsgId, gps) {
-      console.log(gps);
       var events = this.getAll();
       for(var i=(events.length-1); i>=0; i--) {
         if(events[i].user === user) {
@@ -263,6 +262,14 @@ angular.module('starter.services', [])
       return servicesMsg;
     },
 
+    allLessBreak: function() {
+      var services = [];
+      services.push(this.get('1'));
+      services.push(this.get('2'));
+      services.push(this.get('4'));
+      return services;
+    },
+
     remove: function(service) {
       servicesMsg.splice(servicesMsg.indexOf(servicesMsg), 1);
     },
@@ -292,6 +299,10 @@ angular.module('starter.services', [])
   return {
 
     sendToServer: function() {
+      if(!$rootScope.runSync) {
+        return;
+      }
+
       var events = Events.getAllByUser(Login.getCurrentUser());
       var dataPost = [];
 
@@ -314,9 +325,11 @@ angular.module('starter.services', [])
       }
       
       if(dataPost.length === 0) {
+        $rootScope.success = true;
         return;
       }
 
+      $rootScope.hideTabs = true;
       $http.post(API_URL + 'jornadas/cadastrar', { data: angular.toJson(dataPost) }).
         success(function(data) {
           var ids = data.ids;
@@ -324,9 +337,11 @@ angular.module('starter.services', [])
             Events.remove(ids[i]);
           }
           $rootScope.success = true;
+          $rootScope.hideTabs = false;
         }).
         error(function() {
           $rootScope.error = true;
+          $rootScope.hideTabs = false;
         });
     },
 
@@ -339,6 +354,7 @@ angular.module('starter.services', [])
         var checkDate = DateUtils.addMinutes(initialDate, 30);
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.beep(1);
           $cordovaDialogs.alert('O descanso de 30 minutos ultrapassou o limite de tempo.', 'Atenção!', 'OK');
         }
       }
@@ -349,6 +365,7 @@ angular.module('starter.services', [])
         var checkDate = DateUtils.addMinutes(initialDate, 60);
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.beep(1);
           $cordovaDialogs.alert('O limite de tempo da refeição ultrapassou 1 hora.', 'Atenção!', 'OK');
         }
       }
@@ -359,11 +376,10 @@ angular.module('starter.services', [])
         var checkDate = DateUtils.addMinutes(initialDate, 330);
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
+          $cordovaDialogs.beep(1);
           $cordovaDialogs.alert('O limite de tempo de volante ultrapassou 5h30.', 'Atenção!', 'OK');
         }
       }
-
-      $cordovaDialogs.beep(1);
     }
   };
 });
