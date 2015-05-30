@@ -121,6 +121,16 @@ angular.module('starter.services', [])
       $window.localStorage.events = angular.toJson(newEvents);
     },
 
+    setRemoteId: function(eventId, remoteId) {
+      var events = this.getAll();
+      for(var i=0; i<events.length; i++) {
+        if(events[i].id === eventId) {
+          events[i].id = remoteId;
+        }
+      }
+      $window.localStorage.events = angular.toJson(events);
+    },
+
     getAll: function() {
       if($window.localStorage.events) {
         return angular.fromJson($window.localStorage.events);
@@ -307,7 +317,7 @@ angular.module('starter.services', [])
       var dataPost = [];
 
       for(var i=0; i<events.length; i++) {
-        if(events[i].endDate === '') {
+        if(events[i].endDate === '' && angular.isNumber(events[i].id)) {
           continue;
         }
         dataPost.push({ 
@@ -334,7 +344,11 @@ angular.module('starter.services', [])
         success(function(data) {
           var ids = data.ids;
           for(var i=0; i<ids.length; i++) {
-            Events.remove(ids[i]);
+            if(ids[i].delete === 'OK') {
+              Events.remove(ids[i].eventId);
+            } else {
+              Events.setRemoteId(ids[i].eventId, ids[i].remoteId);
+            }
           }
           $rootScope.success = true;
           $rootScope.hideTabs = false;
