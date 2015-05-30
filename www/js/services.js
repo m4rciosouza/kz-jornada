@@ -353,9 +353,12 @@ angular.module('starter.services', [])
           $rootScope.success = true;
           $rootScope.hideTabs = false;
         }).
-        error(function() {
+        error(function(data, status) {
           $rootScope.error = true;
           $rootScope.hideTabs = false;
+          if(status && data.message) {
+            $rootScope.errorMsg = status + ': ' + data.message;
+          }
         });
     },
 
