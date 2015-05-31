@@ -24,6 +24,7 @@ ionic emulate ios
 cordova plugin add cordova-plugin-dialogs
 cordova plugin add cordova-plugin-device
 cordova plugin add cordova-plugin-geolocation
+cordova plugin add cordova-plugin-whitelist
 ```
 
 
