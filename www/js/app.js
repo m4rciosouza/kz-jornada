@@ -20,6 +20,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleLightContent();
     }
   });
+  // disable backbutton action
+  $ionicPlatform.registerBackButtonAction(function() {}, 100);
+  // define intervals
   $interval(Sync.timeAlert, 1000*60*15);
   $interval(Sync.sendToServer, 1000*60*15);
   $rootScope.hideTabs = !($window.localStorage.isLoggedIn || false);
