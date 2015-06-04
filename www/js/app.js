@@ -27,6 +27,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $interval(Sync.sendToServer, 1000*60*15);
   $rootScope.hideTabs = !($window.localStorage.isLoggedIn || false);
   $rootScope.runSync = true;
+  delete $window.localStorage.isDialogOpen;
 })
 
 .constant( 'API_URL', 'http://localhost:8888/kz-jornada-api/web/v1/' )

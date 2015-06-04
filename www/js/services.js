@@ -51,6 +51,22 @@ angular.module('starter.services', [])
   };
 })
 
+.factory('DialogUtils', function($window) {
+  return {
+    setOpen: function(value) {
+      if(value === false) {
+        delete $window.localStorage.isDialogOpen;
+        return;
+      }
+      $window.localStorage.isDialogOpen = value;
+    },
+
+    isOpen: function() {
+      return $window.localStorage.isDialogOpen || false;
+    }
+  };
+})
+
 .factory('Login', function($window, $location, $rootScope) {
   return {
     validate: function() {
@@ -312,7 +328,7 @@ angular.module('starter.services', [])
 })
 
 .factory('Sync', function($rootScope, $cordovaDialogs, Events, Login, DateUtils, $http, 
-    API_URL, VERSAO, ServicesMsg) {
+    API_URL, VERSAO, ServicesMsg, DialogUtils) {
 
   return {
 
@@ -370,6 +386,17 @@ angular.module('starter.services', [])
         });
     },
 
+    processDialogAlert: function(title, message) {
+      if(DialogUtils.isOpen()) {
+        return;
+      }
+      $cordovaDialogs.alert(message, title, 'OK')
+        .then(function() {
+          DialogUtils.setOpen(false);
+        });
+      DialogUtils.setOpen(true);
+    },
+
     timeAlert: function() {
       var current = Events.getCurrentByUser(Login.getCurrentUser());
 
@@ -380,7 +407,13 @@ angular.module('starter.services', [])
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
           $cordovaDialogs.beep(1);
-          $cordovaDialogs.alert('O descanso de 30 minutos ultrapassou o limite de tempo.', 'Atenção!', 'OK');
+          if(!DialogUtils.isOpen()) {
+            $cordovaDialogs.alert('O descanso de 30 minutos ultrapassou o limite de tempo.', 'Atenção!', 'OK')
+              .then(function() {
+                DialogUtils.setOpen(false);
+              });
+            DialogUtils.setOpen(true);
+          }
         }
       }
 
@@ -391,7 +424,13 @@ angular.module('starter.services', [])
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
           $cordovaDialogs.beep(1);
-          $cordovaDialogs.alert('O limite de tempo da refeição ultrapassou 1 hora.', 'Atenção!', 'OK');
+          if(!DialogUtils.isOpen()) {
+            $cordovaDialogs.alert('O limite de tempo da refeição ultrapassou 1 hora.', 'Atenção!', 'OK')
+              .then(function() {
+                DialogUtils.setOpen(false);
+              });
+            DialogUtils.setOpen(true);
+          }
         }
       }
 
@@ -402,7 +441,13 @@ angular.module('starter.services', [])
         var currentDate = new Date();
         if(currentDate.getTime() >= checkDate.getTime()) {
           $cordovaDialogs.beep(1);
-          $cordovaDialogs.alert('O limite de tempo de volante ultrapassou 5h30.', 'Atenção!', 'OK');
+          if(!DialogUtils.isOpen()) {
+            $cordovaDialogs.alert('O limite de tempo de volante ultrapassou 5h30.', 'Atenção!', 'OK')
+              .then(function() {
+                DialogUtils.setOpen(false);
+              });
+            DialogUtils.setOpen(true);
+          }
         }
       }
 
@@ -414,7 +459,13 @@ angular.module('starter.services', [])
         if(currentDate.getTime() >= checkDate.getTime()) {
           console.log('O limite de tempo de repouso ultrapassou 11h.');
           $cordovaDialogs.beep(1);
-          $cordovaDialogs.alert('O limite de tempo de repouso ultrapassou 11h.', 'Atenção!', 'OK');
+          if(!DialogUtils.isOpen()) {
+            $cordovaDialogs.alert('O limite de tempo de repouso ultrapassou 11h.', 'Atenção!', 'OK')
+              .then(function() {
+                DialogUtils.setOpen(false);
+              });
+            DialogUtils.setOpen(true);
+          }
         }
       }
     }
