@@ -28,9 +28,23 @@ angular.module('starter.controllers', [])
       });
   };
 
+  $scope.setEndDateStatus = function(user) {
+    var lastUser = Login.getLastUser();
+    if(lastUser !== user) {
+      var loggedUser = Login.getCurrentUser();
+      var current = Events.getCurrentByUser(loggedUser);
+      if(current) {
+        Events.setEndDateByUser(loggedUser, 'sem status');
+        EventsHist.setEndDateByUser(loggedUser, 'sem status');
+      }
+    }
+  };
+
   $scope.processLogin = function(login) {
     Login.setLoggedIn(true);
     Login.setCurrentUser(login.cpf);
+    $scope.setEndDateStatus(login.cpf);
+    Login.setLastUser(login.cpf);
     login.cpf = '';
     login.pass = '';
     $rootScope.show = true;
@@ -58,12 +72,6 @@ angular.module('starter.controllers', [])
 
   $scope.doLogout = function() {
   	if($scope.isLoggedIn) {
-  		var loggedUser = Login.getCurrentUser();
-  		var current = Events.getCurrentByUser(loggedUser);
-  		if(current) {
-  			Events.setEndDateByUser(loggedUser, 'sem status');
-        EventsHist.setEndDateByUser(loggedUser, 'sem status');
-  		}
   		$scope.logout();
   	}
   };

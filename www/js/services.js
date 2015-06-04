@@ -74,6 +74,14 @@ angular.module('starter.services', [])
 
     setCurrentUser: function(user) {
       $window.localStorage.user = user;
+    },
+
+    setLastUser: function(user) {
+      $window.localStorage.lastUser = user;
+    },
+
+    getLastUser: function() {
+      return $window.localStorage.lastUser || false;
     }
   };
 })
