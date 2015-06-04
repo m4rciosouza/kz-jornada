@@ -134,8 +134,9 @@ angular.module('starter.controllers', [])
   };
 
   $scope.checkHasToJustify = function() {
+    $scope.hasToJustify = false;
+
   	if(!$scope.hasCurrentEvent) {
-  		$scope.hasToJustify = false;
   		return;
   	}
 
@@ -172,7 +173,16 @@ angular.module('starter.controllers', [])
   		return;
   	}
 
-  	$scope.hasToJustify = false;
+    // repouso < 11 horas
+    if($scope.currentEvent.serviceId === '6') {
+      var initialDate = DateUtils.getDateFromText($scope.currentEvent.initialDate);
+      var checkDate = DateUtils.addMinutes(initialDate, 60 * 11);
+      var currentDate = new Date();
+      if(currentDate.getTime() < checkDate.getTime()) {
+        $scope.hasToJustify = true;
+      }
+      return;
+    }
   };
 
   $scope.getCurrentEvent();

@@ -397,6 +397,18 @@ angular.module('starter.services', [])
           $cordovaDialogs.alert('O limite de tempo de volante ultrapassou 5h30.', 'Atenção!', 'OK');
         }
       }
+
+      // repouso > 11h
+      if(current.serviceId === '6') {
+        var initialDate = DateUtils.getDateFromText(current.initialDate);
+        var checkDate = DateUtils.addMinutes(initialDate, 60 * 11);
+        var currentDate = new Date();
+        if(currentDate.getTime() >= checkDate.getTime()) {
+          console.log('O limite de tempo de repouso ultrapassou 11h.');
+          $cordovaDialogs.beep(1);
+          $cordovaDialogs.alert('O limite de tempo de repouso ultrapassou 11h.', 'Atenção!', 'OK');
+        }
+      }
     }
   };
 });
